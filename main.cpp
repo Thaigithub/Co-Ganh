@@ -225,8 +225,12 @@ vector<Position> ganh(int** board, Move m, int player) {
 vector<Position> vay(int** board, Move m, int player) {
     vector <Position> out,check;
     if (comparepos(m.pos_end,m.pos_start)) return out;
+    int** new_board=copy_board(board);
+
+    new_board[m.pos_start.x][m.pos_start.y]=0;
+    new_board[m.pos_end.x][m.pos_end.y]=player;
     check=connection(m.pos_end);
-    filter(check,board,-player);
+    filter(check,new_board,-player);
     bool flag=true;
     while (flag) {
         flag=false;
@@ -246,9 +250,9 @@ vector<Position> vay(int** board, Move m, int player) {
         int size=check.size();
         for (int i=0;i<size;++i) {
             vector <Position> insert=connection(check[0]);
-            filter(insert,board,-player);
-            bool flag1=true;
+            filter(insert,new_board,-player);
             for (int j=0;j<insert.size();++j) {
+                bool flag1=true;
                 for (int k=0;k<out.size();++k) {
                     if (comparepos(insert[j],out[k])) {
                         flag1=false;
@@ -260,10 +264,9 @@ vector<Position> vay(int** board, Move m, int player) {
             check.erase(check.begin());
         }
     }
-    flag=true;
     for (int i=0;i<out.size();++i) {
         check=connection(out[i]);
-        filter(check,board,0);
+        filter(check,new_board,0);
         if (check.size()!=0) {
             out.clear();
             return out;
@@ -458,7 +461,6 @@ void play(int first)
                 break;
             }
         } else {
-            system("cls"); 
             Move m=select_move(board,pre_board,player);
             if (m.pos_start.x==-1 || m.pos_start.y==-1 || m.pos_end.x==-1 || m.pos_end.y==-1) {
                 break;
