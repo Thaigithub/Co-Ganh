@@ -95,7 +95,7 @@ int play(int first)
     int player=1;
     int** board = init_board();
     int** pre_board = nullptr;
-    print_board(board);
+    print_board(board);cout<<endl;
     while(count < limit)
     {
         if (count%2==first) {
@@ -151,10 +151,10 @@ int play(int first)
         }
     }
     if (count<8) {
-        cout<<"You win!"<<endl;
+        cout<<"You win!"<<endl<<endl;
         return 1;
     }
-    cout<<"You lose!"<<endl;
+    cout<<"You lose!"<<endl<<endl;
     return 0;
 }
 
