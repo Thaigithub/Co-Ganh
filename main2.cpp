@@ -142,11 +142,11 @@ int play(int first)
     delete [] pre_board;
     if (first) {
         if (count>8) {
-            cout<<"You win!"<<endl;
+            cout<<"You win!"<<endl<<endl;
             return 1;
         }
         else {
-            cout<<"You lose!"<<endl;
+            cout<<"You lose!"<<endl<<endl;
             return 0;
         }
     }
