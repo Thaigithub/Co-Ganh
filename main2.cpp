@@ -89,7 +89,7 @@ Move select_move(int** current_board, int** previous_board, int player);
 
 void act_move(int** current_board, Move m, int player);
 
-int play(int first)
+void play(int first)
 {
     int count = 0, limit = 50;
     int player=1;
@@ -132,34 +132,29 @@ int play(int first)
             if (board[i][j]==1) ++count;
         }
     }
-    
+    for (int i=0;i<5;++i) {
+        delete [] board[i];
+    }
+    delete [] board;
+    for (int i=0;i<5;++i) {
+        delete [] pre_board[i];
+    }
+    delete [] pre_board;
     if (first) {
-        if (count>8) {
-            cout<<"You win!"<<endl<<endl;
-            return 1;
-        }
-        else {
-            cout<<"You lose!"<<endl<<endl;
-            return 0;
-        }
+        if (count>=8) cout<<"You win!"<<endl;
+        else cout<<"You lose!"<<endl;
     }
-    if (count<8) {
-        cout<<"You win!"<<endl<<endl;
-        return 1;
+    else {
+        if (count>8) cout<<"You lose!"<<endl;
+        else cout<<"You win!"<<endl;
     }
-    cout<<"You lose!"<<endl<<endl;
-    return 0;
 }
 
 int main()
 {
-    int count=0;
     int first=1;
     cin>>first;
-    for (int i=0;i<10;++i) {
-        count+=play(first);
-    }
-    cout<<count<<endl;
+    play(first);
     system("pause");
     return 0;
 }
@@ -435,7 +430,7 @@ Move select_move(int** current_board, int** previous_board, int player) {
     for (int i=0;i<check.size();++i) {
         int **newboard=copy_board(current_board);
         act_move(newboard,check[i],player);
-        probabilities.push_back(minimax(newboard,current_board,-player,5,player));
+        probabilities.push_back(minimax(newboard,current_board,-player,6,player));
         for (int j=0;j<5;++j) delete[] newboard[j];
         delete[] newboard;
     }
