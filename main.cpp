@@ -432,6 +432,10 @@ void play(int first)
             cout<<"Your turn: "<<endl;
             vector<Move> valid_moves = get_valid_moves(board, pre_board, player);
             if(valid_moves.size() != 0) {
+                cout<<"Moves you can go: "<<endl;
+                for (int i=0;i<valid_moves.size();++i) {
+                    cout<<"From: ("<<valid_moves[i].pos_start.y<<" "<<valid_moves[i].pos_start.x<<") to ("<<valid_moves[i].pos_end.y<<" "<<valid_moves[i].pos_end.x<<")"<<endl;
+                }
                 Move m(Position(-1,-1),Position(-1,-1));
                 bool flag=true;
                 while (flag) {
