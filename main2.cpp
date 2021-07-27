@@ -161,8 +161,10 @@ int play(int first)
 int main()
 {
     int count=0;
+    int first=1;
+    cin>>first;
     for (int i=0;i<10;++i) {
-        count+=play(1);
+        count+=play(first);
     }
     cout<<count<<endl;
     system("pause");
