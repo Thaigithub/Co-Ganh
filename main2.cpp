@@ -132,14 +132,7 @@ int play(int first)
             if (board[i][j]==1) ++count;
         }
     }
-    for (int i=0;i<5;++i) {
-        delete [] board[i];
-    }
-    delete [] board;
-    for (int i=0;i<5;++i) {
-        delete [] pre_board[i];
-    }
-    delete [] pre_board;
+    
     if (first) {
         if (count>8) {
             cout<<"You win!"<<endl<<endl;
@@ -442,7 +435,7 @@ Move select_move(int** current_board, int** previous_board, int player) {
     for (int i=0;i<check.size();++i) {
         int **newboard=copy_board(current_board);
         act_move(newboard,check[i],player);
-        probabilities.push_back(minimax(newboard,current_board,-player,6,player));
+        probabilities.push_back(minimax(newboard,current_board,-player,5,player));
         for (int j=0;j<5;++j) delete[] newboard[j];
         delete[] newboard;
     }
