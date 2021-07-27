@@ -442,7 +442,7 @@ Move select_move(int** current_board, int** previous_board, int player) {
     for (int i=0;i<check.size();++i) {
         int **newboard=copy_board(current_board);
         act_move(newboard,check[i],player);
-        probabilities.push_back(minimax(newboard,current_board,-player,5,player));
+        probabilities.push_back(minimax(newboard,current_board,-player,6,player));
         for (int j=0;j<5;++j) delete[] newboard[j];
         delete[] newboard;
     }
