@@ -264,14 +264,42 @@ vector<Position> vay(int** board, Move m, int player) {
             check.erase(check.begin());
         }
     }
+    check.clear();
+    vector<vector<Position>> classification;
     for (int i=0;i<out.size();++i) {
-        check=connection(out[i]);
-        filter(check,new_board,0);
-        if (check.size()!=0) {
-            out.clear();
-            return out;
+        flag=false;
+        for (int j=0;j<classification.size();++j) {
+            for (int k=0;k<classification[j].size();++k) {
+                check=connection(classification[j][k]);
+                filter(check,new_board,-player);
+                for (int l=0;l<check.size();++l) {
+                    if (comparepos(check[l],out[i])) {
+                        classification[j].push_back(out[i]);
+                        flag=true;
+                        break;
+                    }
+                }
+                if (flag) break;
+            }
+            if (flag) break;
         }
-        check.clear();
+        if (!flag) classification.push_back(vector<Position>{out[i]});
+    }
+    out.clear();
+    check.clear();
+    for (int i=0;i<classification.size();++i) {
+        flag=true;
+        for (int j=0;j<classification[i].size();++j) {
+            check=connection(classification[i][j]);
+            filter(check,new_board,0);
+            if (check.size()!=0) {
+                flag=false;
+                break;
+            }
+        }
+        if (flag) {
+            for (int j=0;j<classification[i].size();++j) out.push_back(classification[i][j]);
+        }
     }
     return out;
 }
