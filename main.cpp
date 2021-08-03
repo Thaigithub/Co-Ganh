@@ -431,7 +431,7 @@ void play(int first)
     print_board(board);
     while (count<limit) {
         count++;
-        if (count%2==first) {
+        if (true) {
             cout<<"Your turn: "<<endl;
             vector<Move> valid_moves = get_valid_moves(board, pre_board, player);
             if(valid_moves.size() != 0) {
