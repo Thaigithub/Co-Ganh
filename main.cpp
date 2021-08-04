@@ -102,7 +102,7 @@ int main()
 }
 /*Assignment function********************************************************************************************************************/
 
-/*Addition function**********************************************************************************************************************/
+/*Defining function**********************************************************************************************************************/
 class minimax{
 private:
     float point;
@@ -165,7 +165,7 @@ bool comparepos(Position a, Position b) { //check if the positions are the same
     return (a.x==b.x && a.y==b.y);
 }
 void filter(vector<Position> &a, int** board,int player) { //remove the positons of the board at which are not eual to player
-    for (int i=0;i<a.size();) {
+    for (unsigned int i=0;i<a.size();) {
         if (board[a[i].x][a[i].y]!=player) a.erase(a.begin()+i);
         else ++i;
     }
@@ -184,16 +184,13 @@ vector<Position> connection(Position now) { //return the positions that are conn
     }
     return out;
 }
-/*Addition function**********************************************************************************************************************/
-
-/*Defining function**********************************************************************************************************************/
 vector<Position> ganh(int** board, Move m, int player) {
     vector <Position> out;
     if (comparepos(m.pos_end,m.pos_start)) return out;
     vector <Position> check=connection(m.pos_end);
-    for (int i=0;i<check.size()-1;++i) {
+    for (unsigned int i=0;i<check.size()-1;++i) {
         if (board[check[i].x][check[i].y]==-player) {
-            for (int j=i+1;j<check.size();++j) {
+            for (unsigned int j=i+1;j<check.size();++j) {
                 if (board[check[j].x][check[j].y]==-player && check[j].x==2*m.pos_end.x-check[i].x && check[j].y==2*m.pos_end.y-check[i].y) {
                     out.push_back(check[i]);
                     out.push_back(check[j]);
@@ -206,14 +203,16 @@ vector<Position> ganh(int** board, Move m, int player) {
         }
     }
     int **new_board=copy_board(board);
-    for (int i=0;i<out.size();++i) new_board[out[i].x][out[i].y]=player;
+    for (unsigned int i=0;i<out.size();++i) new_board[out[i].x][out[i].y]=player;
+    new_board[m.pos_start.x][m.pos_start.y]=0;
+    new_board[m.pos_end.x][m.pos_end.y]=player;
     int size=out.size();
     for (int i=0;i<size;++i) {
         check.clear();
         check=vay(new_board,Move(Position(),out[i]),player);
-        for (int j=0;j<check.size();++j) {
+        for (unsigned int j=0;j<check.size();++j) {
             bool flag=true;
-            for (int k=0;k<out.size();++k) {
+            for (unsigned int k=0;k<out.size();++k) {
                 if (comparepos(out[k],check[j])) flag=false;
             }
             if (flag) out.push_back(check[j]);
@@ -221,7 +220,6 @@ vector<Position> ganh(int** board, Move m, int player) {
     }
     return out;
 }
-
 vector<Position> vay(int** board, Move m, int player) {
     vector <Position> out,check;
     if (comparepos(m.pos_end,m.pos_start)) return out;
@@ -234,9 +232,9 @@ vector<Position> vay(int** board, Move m, int player) {
     bool flag=true;
     while (flag) {
         flag=false;
-        for (int i=0;i<check.size();++i) {
+        for (unsigned int i=0;i<check.size();++i) {
             bool flag1=true;
-            for (int j=0;j<out.size();++j) {
+            for (unsigned int j=0;j<out.size();++j) {
                 if (comparepos(out[j],check[i])) {
                     flag1=false;
                     break;
@@ -251,9 +249,9 @@ vector<Position> vay(int** board, Move m, int player) {
         for (int i=0;i<size;++i) {
             vector <Position> insert=connection(check[0]);
             filter(insert,new_board,-player);
-            for (int j=0;j<insert.size();++j) {
+            for (unsigned int j=0;j<insert.size();++j) {
                 bool flag1=true;
-                for (int k=0;k<out.size();++k) {
+                for (unsigned int k=0;k<out.size();++k) {
                     if (comparepos(insert[j],out[k])) {
                         flag1=false;
                         break;
@@ -266,13 +264,13 @@ vector<Position> vay(int** board, Move m, int player) {
     }
     check.clear();
     vector<vector<Position>> classification;
-    for (int i=0;i<out.size();++i) {
+    for (unsigned int i=0;i<out.size();++i) {
         flag=false;
-        for (int j=0;j<classification.size();++j) {
-            for (int k=0;k<classification[j].size();++k) {
+        for (unsigned int j=0;j<classification.size();++j) {
+            for (unsigned int k=0;k<classification[j].size();++k) {
                 check=connection(classification[j][k]);
                 filter(check,new_board,-player);
-                for (int l=0;l<check.size();++l) {
+                for (unsigned int l=0;l<check.size();++l) {
                     if (comparepos(check[l],out[i])) {
                         classification[j].push_back(out[i]);
                         flag=true;
@@ -287,9 +285,9 @@ vector<Position> vay(int** board, Move m, int player) {
     }
     out.clear();
     check.clear();
-    for (int i=0;i<classification.size();++i) {
+    for (unsigned int i=0;i<classification.size();++i) {
         flag=true;
-        for (int j=0;j<classification[i].size();++j) {
+        for (unsigned int j=0;j<classification[i].size();++j) {
             check=connection(classification[i][j]);
             filter(check,new_board,0);
             if (check.size()!=0) {
@@ -298,12 +296,11 @@ vector<Position> vay(int** board, Move m, int player) {
             }
         }
         if (flag) {
-            for (int j=0;j<classification[i].size();++j) out.push_back(classification[i][j]);
+            for (unsigned int j=0;j<classification[i].size();++j) out.push_back(classification[i][j]);
         }
     }
     return out;
 }
-
 vector<Move> bay_or_mo(int** current_board, int** previous_board, int player) {
     vector <Move> out;
     if (previous_board!=NULL) {
@@ -340,7 +337,6 @@ vector<Move> bay_or_mo(int** current_board, int** previous_board, int player) {
     }
     return out;
 }
-
 vector<Move> get_valid_moves(int** current_board, int** previous_board, int player) {
     vector <Move> out;
     if (previous_board!=NULL) {
@@ -396,7 +392,6 @@ vector<Move> get_valid_moves(int** current_board, int** previous_board, int play
     }
     return out;
 }
-
 Move select_move(int** current_board, int** previous_board, int player) {
     vector<Move> check=get_valid_moves(current_board,previous_board,player);
     vector<minimax> probabilities;
@@ -404,7 +399,7 @@ Move select_move(int** current_board, int** previous_board, int player) {
     for (int i=0;i<check.size();++i) {
         int **newboard=copy_board(current_board);
         act_move(newboard,check[i],player);
-        probabilities.push_back(minimax(newboard,current_board,-player,5,player));
+        probabilities.push_back(minimax(newboard,current_board,-player,4,player));
         for (int j=0;j<5;++j) delete[] newboard[j];
         delete[] newboard;
     }
@@ -426,6 +421,34 @@ Move select_move(int** current_board, int** previous_board, int player) {
         }
         else ++i;
     }
+    if (check.size()<=5) {
+        probabilities.clear();
+        for (int i=0;i<check.size();++i) {
+            int **newboard=copy_board(current_board);
+            act_move(newboard,check[i],player);
+            probabilities.push_back(minimax(newboard,current_board,-player,5,player));
+            for (int j=0;j<5;++j) delete[] newboard[j];
+            delete[] newboard;
+        }
+        choice=0;
+        if (player>0) {
+            for (int i=1;i<probabilities.size();++i) {
+                if (probabilities[i].getpoint()>probabilities[choice].getpoint()) choice=i;
+            }
+        }
+        else {
+            for (int i=1;i<probabilities.size();++i) {
+                if (probabilities[i].getpoint()<probabilities[choice].getpoint()) choice=i;
+            }
+        }
+        for (int i=0;i<probabilities.size();) {
+            if (probabilities[i].getpoint()!=probabilities[choice].getpoint()) {
+                check.erase(check.begin()+i);
+                probabilities.erase(probabilities.begin()+i);
+            }
+            else ++i;
+        }
+    }
     choice=0;
     if (player>0) {
         for (int i=1;i<probabilities.size();++i) {
@@ -439,7 +462,6 @@ Move select_move(int** current_board, int** previous_board, int player) {
     }
     return check[choice];
 }
-
 void act_move(int** current_board, Move m, int player) {
     vector <Position> g, v;
     g=ganh(current_board,m,player);
@@ -459,7 +481,7 @@ void play(int first)
     print_board(board);
     while (count<limit) {
         count++;
-        if (count%2==first) {
+        if (/*count%2==first*/false) {
             cout<<"Your turn: "<<endl;
             vector<Move> valid_moves = get_valid_moves(board, pre_board, player);
             if(valid_moves.size() != 0) {

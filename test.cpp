@@ -92,26 +92,26 @@ void act_move(int** current_board, Move m, int player);
 
 int main()
 {
-    // fstream input;
-    // input.open("F:/EDUCATION/University/HK203/Data structure and Analysis/Co-Ganh/input.txt");
-    // int **board=new int*[5];
-    // for (int i = 0; i < 5; ++i) {
-    //     board[i]=new int[5];
-    // }
-    // for (int i=0;i<5;++i) {
-    //     for (int j=0;j<5;++j) input>>board[i][j];
-    // }
-    // int x_old,y_old,x_new,y_new;
-    // input>>x_old>>y_old>>x_new>>y_new;
-    // Move m(Position(x_old,y_old),Position(x_new,y_new));
-    // act_move(board,m,1);
-    // print_board(board);
-    // input.close();
-    int **board=init_board();
-    int **prev=NULL;
-    time_t current_time=time(NULL);
-    select_move(board,prev,1);
-    cout<<difftime(time(NULL),current_time)<<endl;
+    fstream input;
+    input.open("F:/EDUCATION/University/HK203/Data structure and Analysis/Co-Ganh/input.txt");
+    int **board=new int*[5];
+    for (int i = 0; i < 5; ++i) {
+        board[i]=new int[5];
+    }
+    for (int i=0;i<5;++i) {
+        for (int j=0;j<5;++j) input>>board[i][j];
+    }
+    int x_old,y_old,x_new,y_new;
+    input>>x_old>>y_old>>x_new>>y_new;
+    Move m(Position(x_old,y_old),Position(x_new,y_new));
+    act_move(board,m,1);
+    print_board(board);
+    input.close();
+    // int **board=init_board();
+    // int **prev=NULL;
+    // time_t current_time=time(NULL);
+    // select_move(board,prev,1);
+    // cout<<difftime(time(NULL),current_time)<<endl;
     return 0;
 }
 
@@ -202,19 +202,20 @@ vector<Position> ganh(int** board, Move m, int player) {
     vector <Position> out;
     if (comparepos(m.pos_end,m.pos_start)) return out;
     vector <Position> check=connection(m.pos_end);
-    for (unsigned int i=0;i<check.size()-1;++i) {
-        if (board[check[i].x][check[i].y]==-player) {
-            for (unsigned int j=i+1;j<check.size();++j) {
-                if (board[check[j].x][check[j].y]==-player && check[j].x==2*m.pos_end.x-check[i].x && check[j].y==2*m.pos_end.y-check[i].y) {
-                    out.push_back(check[i]);
-                    out.push_back(check[j]);
-                    check.erase(check.begin()+i);
-                    check.erase(check.begin()+j);
-                    --i;
-                    break;
-                }
+    filter(check,board,-player);
+    for (int i=0;i<int(check.size()-1);) {
+        bool flag=true;
+        for (unsigned int j=i+1;j<check.size();++j) {
+            if (check[j].x+check[i].x==2*m.pos_end.x && check[j].y+check[i].y==2*m.pos_end.y) {
+                out.push_back(check[i]);
+                out.push_back(check[j]);
+                check.erase(check.begin()+i);
+                check.erase(check.begin()+j-1);
+                flag=false;
+                break;
             }
         }
+        if (flag) ++i;
     }
     int **new_board=copy_board(board);
     for (unsigned int i=0;i<out.size();++i) new_board[out[i].x][out[i].y]=player;
@@ -435,31 +436,33 @@ Move select_move(int** current_board, int** previous_board, int player) {
         }
         else ++i;
     }
-    probabilities.clear();
-    for (int i=0;i<check.size();++i) {
-        int **newboard=copy_board(current_board);
-        act_move(newboard,check[i],player);
-        probabilities.push_back(minimax(newboard,current_board,-player,5,player));
-        for (int j=0;j<5;++j) delete[] newboard[j];
-        delete[] newboard;
-    }
-    choice=0;
-    if (player>0) {
-        for (int i=1;i<probabilities.size();++i) {
-            if (probabilities[i].getpoint()>probabilities[choice].getpoint()) choice=i;
+    if (check.size()<=5) {
+        probabilities.clear();
+        for (int i=0;i<check.size();++i) {
+            int **newboard=copy_board(current_board);
+            act_move(newboard,check[i],player);
+            probabilities.push_back(minimax(newboard,current_board,-player,5,player));
+            for (int j=0;j<5;++j) delete[] newboard[j];
+            delete[] newboard;
         }
-    }
-    else {
-        for (int i=1;i<probabilities.size();++i) {
-            if (probabilities[i].getpoint()<probabilities[choice].getpoint()) choice=i;
+        choice=0;
+        if (player>0) {
+            for (int i=1;i<probabilities.size();++i) {
+                if (probabilities[i].getpoint()>probabilities[choice].getpoint()) choice=i;
+            }
         }
-    }
-    for (int i=0;i<probabilities.size();) {
-        if (probabilities[i].getpoint()!=probabilities[choice].getpoint()) {
-            check.erase(check.begin()+i);
-            probabilities.erase(probabilities.begin()+i);
+        else {
+            for (int i=1;i<probabilities.size();++i) {
+                if (probabilities[i].getpoint()<probabilities[choice].getpoint()) choice=i;
+            }
         }
-        else ++i;
+        for (int i=0;i<probabilities.size();) {
+            if (probabilities[i].getpoint()!=probabilities[choice].getpoint()) {
+                check.erase(check.begin()+i);
+                probabilities.erase(probabilities.begin()+i);
+            }
+            else ++i;
+        }
     }
     choice=0;
     if (player>0) {
