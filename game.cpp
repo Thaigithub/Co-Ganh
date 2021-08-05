@@ -481,36 +481,47 @@ void play(int first)
     print_board(board);
     while (count<limit) {
         count++;
-        if (/*count%2==first*/false) {
-            cout<<"Your turn: "<<endl;
+        if (count%2==first) {
+            // cout<<"Your turn: "<<endl;
+            // vector<Move> valid_moves = get_valid_moves(board, pre_board, player);
+            // if(valid_moves.size() != 0) {
+            //     cout<<"Moves you can go: "<<endl;
+            //     for (int i=0;i<valid_moves.size();++i) {
+            //         cout<<"From: ("<<valid_moves[i].pos_start.y<<" "<<valid_moves[i].pos_start.x<<") to ("<<valid_moves[i].pos_end.y<<" "<<valid_moves[i].pos_end.x<<")"<<endl;
+            //     }
+            //     Move m(Position(-1,-1),Position(-1,-1));
+            //     bool flag=true;
+            //     while (flag) {
+            //         int x_old=-1,y_old=-1,x_new=-1,y_new=-1;
+            //         while ((0>x_old)||(x_old>4)||(0>y_old)||(y_old>4)||(0>x_new)||(x_new>4)||(0>y_new)||(y_new>4)) {
+            //             cout<<"Load the coordinate from (x y): ";
+            //             cin>>y_old>>x_old;
+            //             cout<<"Load the coordinate to (x y): ";
+            //             cin>>y_new>>x_new;
+            //         }
+            //         m=Move(Position(x_old,y_old),Position(x_new,y_new));
+            //         for (int i=0;i<valid_moves.size();++i) {
+            //             if (comparepos(m.pos_start,valid_moves[i].pos_start)&&comparepos(m.pos_end,valid_moves[i].pos_end)) flag=false;
+            //         }
+            //     }
+            //     pre_board = copy_board(board);
+            //     act_move(board, m, player);
+            // }
+            // else {
+            //     break;
+            // }
             vector<Move> valid_moves = get_valid_moves(board, pre_board, player);
-            if(valid_moves.size() != 0) {
-                cout<<"Moves you can go: "<<endl;
-                for (int i=0;i<valid_moves.size();++i) {
-                    cout<<"From: ("<<valid_moves[i].pos_start.y<<" "<<valid_moves[i].pos_start.x<<") to ("<<valid_moves[i].pos_end.y<<" "<<valid_moves[i].pos_end.x<<")"<<endl;
-                }
-                Move m(Position(-1,-1),Position(-1,-1));
-                bool flag=true;
-                while (flag) {
-                    int x_old=-1,y_old=-1,x_new=-1,y_new=-1;
-                    while ((0>x_old)||(x_old>4)||(0>y_old)||(y_old>4)||(0>x_new)||(x_new>4)||(0>y_new)||(y_new>4)) {
-                        cout<<"Load the coordinate from (x y): ";
-                        cin>>y_old>>x_old;
-                        cout<<"Load the coordinate to (x y): ";
-                        cin>>y_new>>x_new;
-                    }
-                    m=Move(Position(x_old,y_old),Position(x_new,y_new));
-                    for (int i=0;i<valid_moves.size();++i) {
-                        if (comparepos(m.pos_start,valid_moves[i].pos_start)&&comparepos(m.pos_end,valid_moves[i].pos_end)) flag=false;
-                    }
-                }
+            if(valid_moves.size() != 0)
+            {
+                srand (time(NULL));
+                int index = rand()% valid_moves.size();
+                Move new_move = valid_moves[index];
                 pre_board = copy_board(board);
-                act_move(board, m, player);
+                act_move(board, new_move, player);
             }
-            else {
-                break;
-            }
-        } else {
+            else break;
+        }
+        else {
             time_t current_time=time(NULL);
             Move m=select_move(board,pre_board,player);
             cout<<difftime(time(NULL),current_time)<<endl;
