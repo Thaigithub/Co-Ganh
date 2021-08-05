@@ -6,7 +6,6 @@
 
 using namespace std;
 
-/*Assignment function********************************************************************************************************************/
 int** init_board()
 {
     int** t = new int*[5];
@@ -28,6 +27,7 @@ int** init_board()
     t[2][4] = -1; t[3][0] = -1; t[3][4] = -1;
     return t;
 }
+
 int** copy_board(int** board)
 {
     int** n_b = new int*[5];
@@ -41,25 +41,24 @@ int** copy_board(int** board)
     }
     return n_b;
 }
+
 void print_board(int** board)
 {
-    cout<<"  0 1 2 3 4 x"<<endl;
     for(int i = 0; i < 5; i++)
     {
-        cout<<i<<" ";
         for(int j = 0; j < 5; j++)
         {
-            if(board[i][j] == 1)
+            if(board[4-i][j] == 1)
                 cout << "X ";
-            else if(board[i][j] == -1)
+            else if(board[4-i][j] == -1)
                 cout << "O ";
             else
                 cout << "- ";
         }
         cout << endl;
     }
-    cout<<"y"<<endl;
 }
+
 struct Position
 {
     int x; int y;
@@ -69,6 +68,7 @@ struct Position
         x = a; y = b;
     }
 };
+
 struct Move
 {
     Position pos_start, pos_end;
@@ -77,30 +77,54 @@ struct Move
         pos_start = s; pos_end = e;
     }
 };
+
 vector<Position> ganh(int** board, Move m, int player);
+
 vector<Position> vay(int** board, Move m, int player);
+
 vector<Move> bay_or_mo(int** current_board, int** previous_board, int player);
+
 vector<Move> get_valid_moves(int** current_board, int** previous_board, int player);
+
 Move select_move(int** current_board, int** previous_board, int player);
+
 void act_move(int** current_board, Move m, int player);
-void play(int player);
+
+void play(int first)
+{
+    int count = 0, limit = 70;
+    int player;
+    if(first == 1)
+        player = 1;
+    else
+        player = -1;
+
+    int** board = init_board();
+    int** pre_board = nullptr;
+    print_board(board);
+    while(count < limit)
+    {
+        count++;
+        vector<Move> valid_moves = get_valid_moves(board, pre_board, player);
+        if(valid_moves.size() != 0)
+        {
+            srand (time(NULL));
+            int index = rand()% valid_moves.size();
+            Move new_move = valid_moves[index];
+            pre_board = copy_board(board);
+            act_move(board, new_move, player);
+        }
+        else
+            break;
+        player *= -1;
+    }
+}
+
 int main()
 {
-    cout<<"Welcome to Co Ganh on C++ by Thai Tran"<<endl;
-    int first=-1;
-    while (first!=1 && first!=0) {
-        cout<<"Want to start first? (1 for yes and 0 for no): ";
-        cin>>first;
-        cout<<"You are X"<<endl;
-    }
-    play(first);
-    cout<<endl<<"If you win, please take a screenshot and send me, I'll buy you a drink when we meet again"<<endl;
-    cout<<"Please give me a feedback at: https://docs.google.com/forms/d/1k9DOVuHvqHjWDzmbX3Rc98qcRitrQv9yMZAGjC1rBRg/viewform?edit_requested=true#responses"<<endl;
-    cout<<"Co Ganh - by Thai Tran - DSA Semester 203"<<endl;
-    system("pause");
+    play(1);
     return 0;
 }
-/*Assignment function********************************************************************************************************************/
 
 /*Defining function**********************************************************************************************************************/
 class minimax{
@@ -188,19 +212,20 @@ vector<Position> ganh(int** board, Move m, int player) {
     vector <Position> out;
     if (comparepos(m.pos_end,m.pos_start)) return out;
     vector <Position> check=connection(m.pos_end);
-    for (unsigned int i=0;i<check.size()-1;++i) {
-        if (board[check[i].x][check[i].y]==-player) {
-            for (unsigned int j=i+1;j<check.size();++j) {
-                if (board[check[j].x][check[j].y]==-player && check[j].x==2*m.pos_end.x-check[i].x && check[j].y==2*m.pos_end.y-check[i].y) {
-                    out.push_back(check[i]);
-                    out.push_back(check[j]);
-                    check.erase(check.begin()+i);
-                    check.erase(check.begin()+j);
-                    --i;
-                    break;
-                }
+    filter(check,board,-player);
+    for (int i=0;i<int(check.size()-1);) {
+        bool flag=true;
+        for (unsigned int j=i+1;j<check.size();++j) {
+            if (check[j].x+check[i].x==2*m.pos_end.x && check[j].y+check[i].y==2*m.pos_end.y) {
+                out.push_back(check[i]);
+                out.push_back(check[j]);
+                check.erase(check.begin()+i);
+                check.erase(check.begin()+j-1);
+                flag=false;
+                break;
             }
         }
+        if (flag) ++i;
     }
     int **new_board=copy_board(board);
     for (unsigned int i=0;i<out.size();++i) new_board[out[i].x][out[i].y]=player;
@@ -470,84 +495,5 @@ void act_move(int** current_board, Move m, int player) {
     for (int i=0;i<v.size();++i) current_board[v[i].x][v[i].y]=player;
     current_board[m.pos_start.x][m.pos_start.y]=0;
     current_board[m.pos_end.x][m.pos_end.y]=player;
-}
-
-void play(int first)
-{
-    int player=1;
-    int count = 0, limit = 50;
-    int** board = init_board();
-    int** pre_board = nullptr;
-    print_board(board);
-    while (count<limit) {
-        count++;
-        if (/*count%2==first*/false) {
-            cout<<"Your turn: "<<endl;
-            vector<Move> valid_moves = get_valid_moves(board, pre_board, player);
-            if(valid_moves.size() != 0) {
-                cout<<"Moves you can go: "<<endl;
-                for (int i=0;i<valid_moves.size();++i) {
-                    cout<<"From: ("<<valid_moves[i].pos_start.y<<" "<<valid_moves[i].pos_start.x<<") to ("<<valid_moves[i].pos_end.y<<" "<<valid_moves[i].pos_end.x<<")"<<endl;
-                }
-                Move m(Position(-1,-1),Position(-1,-1));
-                bool flag=true;
-                while (flag) {
-                    int x_old=-1,y_old=-1,x_new=-1,y_new=-1;
-                    while ((0>x_old)||(x_old>4)||(0>y_old)||(y_old>4)||(0>x_new)||(x_new>4)||(0>y_new)||(y_new>4)) {
-                        cout<<"Load the coordinate from (x y): ";
-                        cin>>y_old>>x_old;
-                        cout<<"Load the coordinate to (x y): ";
-                        cin>>y_new>>x_new;
-                    }
-                    m=Move(Position(x_old,y_old),Position(x_new,y_new));
-                    for (int i=0;i<valid_moves.size();++i) {
-                        if (comparepos(m.pos_start,valid_moves[i].pos_start)&&comparepos(m.pos_end,valid_moves[i].pos_end)) flag=false;
-                    }
-                }
-                pre_board = copy_board(board);
-                act_move(board, m, player);
-            }
-            else {
-                break;
-            }
-        } else {
-            time_t current_time=time(NULL);
-            Move m=select_move(board,pre_board,player);
-            cout<<difftime(time(NULL),current_time)<<endl;
-            if (m.pos_start.x==-1 || m.pos_start.y==-1 || m.pos_end.x==-1 || m.pos_end.y==-1) {
-                break;
-            }
-            else {
-                cout<<"My turn: "<<endl;
-                pre_board = copy_board(board);
-                act_move(board, m, player);
-            }        
-        }
-        player *= -1;
-        print_board(board);
-    }
-    print_board(board);
-    count=0;
-    for (int i=0;i<5;++i) {
-        for (int j=0;j<5;++j) {
-            if (board[i][j]==1) ++count;
-        }
-    }
-    for (int i=0;i<5;++i) {
-        delete [] board[i];
-    }
-    delete [] board;
-    for (int i=0;i<5;++i) {
-        delete [] pre_board[i];
-    }
-    delete [] pre_board;
-    if (first) {
-        if (count>=8) cout<<"You win!"<<endl;
-        else cout<<"You lose!"<<endl;
-    }
-    else {
-        if (count>8) cout<<"You lose!"<<endl;
-        else cout<<"You win!"<<endl;
-    }
 }
 /*Defining function**********************************************************************************************************************/
